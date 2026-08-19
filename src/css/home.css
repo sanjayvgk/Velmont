@@ -1,0 +1,769 @@
+/* ============================================================
+   Velmont — Home page
+   Reference: plan/DESIGN_GUIDE.md §5, plan/CONTENT_PLAN.html §01.*
+   Section ids: hero, work, studio, disciplines, process, stats, cta
+   ============================================================ */
+
+/* Shared layout classes (.vm-section, .vm-kicker, .vm-link, .vm-stats, .vm-cta)
+   live in common.css — imported by index.html before home.css. */
+
+/* ----------------------------------------------------------------
+   01.1  Hero (700px, photo background + dark overlay)
+   ---------------------------------------------------------------- */
+.vm-hero {
+  position: relative;
+  height: var(--hero-h); /* 700px */
+  padding: 70px var(--pad-side);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  color: #fff;
+  background: #2b2927; /* dark fallback if image fails */
+}
+
+/* Hero crossfade carousel — multiple background images that dissolve into each other */
+.vm-hero__slides {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.vm-hero__slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+}
+
+.vm-hero__slide.is-active {
+  opacity: 1;
+}
+
+/* Gradient overlay sits on top of the photo. Top stop deepened from .1 to
+   .3 — the eyebrow line sits near the top of the anchored-bottom text
+   stack and was blending into brighter slide images at that opacity. */
+.vm-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(0deg, rgba(8, 8, 8, 0.72) 0%, rgba(8, 8, 8, 0.34) 55%, rgba(8, 8, 8, 0.3) 100%),
+    linear-gradient(125deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.36));
+}
+
+/* All text content floats above the overlay */
+.vm-hero__eyebrow,
+.vm-hero__h1,
+.vm-hero__cta,
+.vm-hero__meta {
+  position: relative;
+  z-index: 2;
+}
+
+.vm-hero__eyebrow {
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: var(--fs-eyebrow);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(224, 217, 207, 0.92);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  margin: 0 0 24px;
+}
+
+/* Margin-bottom widened from 28px to 44px — the headline now leads
+   straight into the CTA with no description paragraph between them,
+   so it needs a deliberate gap of its own to read as an intentional
+   pause rather than a cramped leftover. */
+.vm-hero__h1 {
+  font-family: var(--head);
+  font-weight: 600;
+  font-size: var(--fs-hero-h1); /* 88px */
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  color: #fff;
+  margin: 0 0 44px;
+  max-width: 900px;
+}
+
+.vm-hero__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--body);
+  font-weight: 500;
+  font-size: 13.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #fff;
+  text-decoration: none;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+  width: max-content;
+}
+
+.vm-hero__cta__arrow {
+  color: var(--terracotta);
+}
+
+.vm-hero__meta {
+  position: absolute;
+  right: var(--pad-side);
+  bottom: 70px;
+  font-family: var(--body);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: right;
+  line-height: 1.8;
+  margin: 0;
+}
+
+/* ----------------------------------------------------------------
+   01.3  Our Projects — sliding window carousel (3 visible, 1 advances)
+   ---------------------------------------------------------------- */
+.vm-work {
+  background: var(--vblack);
+  color: rgba(255, 255, 255, 0.92);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.vm-work__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px var(--pad-side);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.vm-work__kicker {
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: var(--fs-eyebrow);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(209, 200, 188, 0.82);
+  margin: 0;
+}
+
+.vm-work__slider {
+  overflow: hidden;
+}
+
+.vm-work__slides {
+  display: flex;
+  /* transition managed inline by home.js for reliable seamless looping */
+}
+
+.vm-work__tile {
+  min-width: calc(100% / 3);
+  min-height: 440px;
+  flex-shrink: 0;
+  padding: var(--pad-tile-y) var(--pad-tile-x); /* 28px 40px */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-decoration: none;
+  color: inherit;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  transition: background var(--t-fast) var(--ease-default);
+}
+
+.vm-work__tile:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.vm-work__tile__discipline {
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 24px;
+}
+
+.vm-work__tile__name {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: var(--fs-work-tile-name); /* 28px */
+  line-height: 1.18;
+  color: #fff;
+  margin: 0 0 16px;
+}
+
+.vm-work__tile__location {
+  font-family: var(--body);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.04em;
+  margin: 0 0 28px;
+}
+
+.vm-work__tile__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.vm-work__tile__year {
+  font-family: var(--body);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.vm-work__tile__arrow {
+  color: var(--terracotta);
+  font-family: var(--body);
+  font-size: 18px;
+}
+
+/* ----------------------------------------------------------------
+   01.35  Clients — "Trusted by" logo marquee
+   ---------------------------------------------------------------- */
+.vm-clients {
+  border-bottom: 1px solid var(--mineral);
+  overflow: hidden;
+}
+
+.vm-clients__header {
+  padding: 28px var(--pad-side) 0;
+}
+
+.vm-clients__kicker {
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: var(--fs-eyebrow);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--slate-text);
+  margin: 0;
+}
+
+.vm-clients__viewport {
+  overflow: hidden;
+  /* fade the strip in/out at the edges */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  padding: 34px 0;
+}
+
+.vm-clients__track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  gap: 72px;
+  animation: vm-marquee 46s linear infinite;
+  /* Promote to its own compositor layer so the transform animation runs on the
+     GPU and stays smooth while logos rasterise on first load (mobile jank fix). */
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.vm-clients:hover .vm-clients__track {
+  animation-play-state: paused;
+}
+
+.vm-clients__item {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 180px;
+  height: 80px;
+}
+
+.vm-clients__logo {
+  max-height: 64px;
+  max-width: 140px;
+  width: auto;
+  height: auto;
+  transition: transform var(--t-fast) var(--ease-default);
+}
+
+.vm-clients__item:hover .vm-clients__logo {
+  transform: scale(1.05);
+}
+
+/* Text fallback shown until a real logo file is supplied */
+.vm-clients__wordmark {
+  font-family: var(--serif);
+  font-size: 22px;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  color: var(--slate-text);
+}
+
+@keyframes vm-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    /* set is rendered twice; shifting one full set width loops seamlessly */
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vm-clients__track {
+    animation: none;
+    flex-wrap: wrap;
+    width: auto;
+    justify-content: center;
+    gap: 48px 72px;
+    padding: 0 var(--pad-side);
+  }
+  .vm-clients__viewport {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  /* no scroll = no need for the duplicated set */
+  .vm-clients__item[aria-hidden='true'] {
+    display: none;
+  }
+}
+
+/* ----------------------------------------------------------------
+   01.4  About Velmont — two-column
+   ---------------------------------------------------------------- */
+.vm-studio {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--col-gap);
+}
+
+.vm-studio__h {
+  font-family: var(--head);
+  font-weight: 600;
+  font-size: var(--fs-section-h2); /* 48px */
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  color: var(--vblack);
+  max-width: 500px;
+  margin: 0 0 36px;
+}
+
+.vm-studio__body p {
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.78;
+  color: var(--body-text);
+  max-width: 460px;
+  margin: 0 0 22px;
+}
+
+/* ----------------------------------------------------------------
+   01.5  Disciplines strip
+   Grid: 240px label + 4 disciplines
+   ---------------------------------------------------------------- */
+.vm-disciplines {
+  padding: 72px var(--pad-side);
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 100px;
+  align-items: center;
+  border-top: 1px solid var(--mineral);
+  border-bottom: 1px solid var(--mineral);
+}
+
+.vm-disciplines__intro {
+  display: flex;
+  align-items: center;
+}
+
+.vm-disciplines__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.vm-disciplines__cell {
+  padding: 0 36px;
+  border-left: 1px solid var(--mineral);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.vm-disciplines__cell:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.vm-disciplines__name {
+  font-family: var(--head);
+  font-weight: 600;
+  font-size: 28px;
+  letter-spacing: -0.01em;
+  color: var(--vblack);
+}
+
+.vm-disciplines__desc {
+  font-family: var(--body);
+  font-size: 14.5px;
+  letter-spacing: 0.04em;
+  color: var(--slate-text);
+}
+
+/* ----------------------------------------------------------------
+   01.6  Process strip (dark, full viewport height)
+   ---------------------------------------------------------------- */
+.vm-process {
+  min-height: 100vh;
+  padding: 120px var(--pad-side);
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 100px;
+  align-items: center;
+}
+
+.vm-process__head h2 {
+  font-family: var(--head);
+  font-weight: 600;
+  font-size: 58px;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  color: #fff;
+  margin: 0 0 28px;
+  max-width: 340px;
+}
+
+.vm-process__head p {
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.78;
+  color: rgba(255, 255, 255, 0.72);
+  max-width: 360px;
+  margin: 0;
+}
+
+.vm-process__steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.vm-process__step {
+  padding: 0 36px;
+  border-left: 1px solid rgba(187, 188, 195, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.vm-process__step:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.vm-process__step__num {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 64px;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.14);
+}
+
+.vm-process__step__title {
+  font-family: var(--head);
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+
+.vm-process__step__desc {
+  font-family: var(--body);
+  font-size: 14.5px;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* ----------------------------------------------------------------
+   Stats + CTA — unified finale section on paper background
+   ---------------------------------------------------------------- */
+.vm-finale {
+  background: var(--paper);
+  padding: 100px var(--pad-side);
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 80px;
+}
+
+.vm-finale__stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--mineral);
+  border-bottom: 1px solid var(--mineral);
+  padding: 56px 0;
+}
+
+.vm-finale__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-right: 1px solid var(--mineral);
+  padding: 0 40px;
+}
+
+.vm-finale__stat:first-child {
+  padding-left: 0;
+}
+
+.vm-finale__stat:last-child {
+  border-right: 0;
+}
+
+.vm-finale__h {
+  font-family: var(--head);
+  font-weight: 600;
+  font-size: var(--fs-section-h2); /* 48px */
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  color: var(--vblack);
+  margin: 0 0 20px;
+  max-width: 760px;
+}
+
+.vm-finale__sub {
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--body-text);
+  max-width: 540px;
+  margin: 0 0 36px;
+}
+
+.vm-finale__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--body);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--vblack);
+  text-decoration: none;
+  background: transparent;
+  border: 1px solid var(--terracotta);
+  border-radius: 2px;
+  padding: 11px 28px;
+  transition:
+    background var(--t-fast) var(--ease-default),
+    color var(--t-fast) var(--ease-default);
+}
+
+.vm-finale__link:hover {
+  background: var(--terracotta);
+  color: var(--paper);
+}
+
+/* ---- Responsive (see base.css for the shared media-query rationale) ---- */
+@media (max-width: 1023px) {
+  /* Hero — content-driven height instead of a fixed crop, so the
+     eyebrow/h1/cta/meta stack can never get clipped by overflow:hidden
+     on a narrow viewport, plus a tighter vertical rhythm so the
+     composition reads as intentional, not just a shrunk desktop
+     layout. No description paragraph — headline leads straight into
+     the CTA (see index.html). */
+  .vm-hero {
+    height: auto;
+    min-height: var(--hero-h);
+    padding: 56px var(--pad-side) 40px;
+  }
+
+  .vm-hero__eyebrow {
+    margin: 0 0 16px;
+  }
+
+  .vm-hero__h1 {
+    margin: 0 0 30px;
+    max-width: 640px;
+  }
+
+  /* Was absolutely positioned bottom-right, competing with the CTA for
+     the same cramped corner at narrow widths. Dropped into flow below
+     the CTA, left-aligned with the rest of the stack, separated by a
+     hairline rather than raw whitespace — reads as a clean sign-off
+     line instead of a second, disconnected block. */
+  .vm-hero__meta {
+    position: static;
+    text-align: left;
+    margin: 28px 0 0;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+  }
+
+  .vm-studio,
+  .vm-disciplines,
+  .vm-process {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .vm-process {
+    min-height: auto;
+    padding: 56px var(--pad-side);
+  }
+
+  .vm-process__head h2 {
+    font-size: 32px;
+    max-width: none;
+  }
+
+  .vm-process__step__num {
+    font-size: 44px;
+  }
+
+  .vm-disciplines__grid,
+  .vm-process__steps {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px 0;
+  }
+
+  .vm-disciplines__cell,
+  .vm-process__step {
+    border-left: 0;
+    padding: 0;
+  }
+
+  .vm-disciplines__name {
+    font-size: 22px;
+  }
+
+  /* Stats+CTA finale — 80vh/100px/80px are desktop-tuned for a full
+     viewport statement section; uncapped, they force a mobile phone to
+     scroll through mostly empty space to reach the 4 numbers. */
+  .vm-finale {
+    min-height: auto;
+    padding: 64px var(--pad-side);
+    gap: 48px;
+  }
+
+  .vm-finale__stats {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 40px 0;
+  }
+
+  /* Rewritten from scratch rather than layered on the desktop
+     :first-child/:last-child rules — those only make sense for a
+     single row of 4 and, applied to a 2x2 grid, left cell 1 flush
+     left while cell 3 (same column) kept its 20px gutter, and left
+     the bottom row carrying a dangling 24px padding-bottom after its
+     divider was removed. nth-child(odd/2n) keys off actual grid
+     position instead, so both columns/rows are symmetric. */
+  .vm-finale__stat {
+    padding: 0 20px 24px;
+    border-right: 1px solid var(--mineral);
+    border-bottom: 1px solid var(--mineral);
+  }
+
+  .vm-finale__stat:nth-child(odd) {
+    padding-left: 0;
+  }
+
+  .vm-finale__stat:nth-child(2n) {
+    padding-right: 0;
+    border-right: 0;
+  }
+
+  .vm-finale__stat:nth-last-child(-n + 2) {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  /* "Our Projects" slider — ~2 tiles visible on tablet */
+  .vm-work__tile {
+    min-width: 46%;
+  }
+}
+
+@media (max-width: 599px) {
+  .vm-hero {
+    padding: 48px 20px 32px;
+  }
+
+  .vm-hero__eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    margin: 0 0 14px;
+  }
+
+  .vm-hero__h1 {
+    margin: 0 0 24px;
+  }
+
+  .vm-hero__cta {
+    font-size: 12px;
+  }
+
+  .vm-hero__meta {
+    font-size: 10px;
+    margin: 22px 0 0;
+    padding-top: 16px;
+  }
+
+  .vm-disciplines__grid,
+  .vm-process__steps {
+    grid-template-columns: 1fr;
+  }
+
+  .vm-disciplines__cell,
+  .vm-process__step {
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--mineral);
+  }
+
+  .vm-process__step {
+    border-bottom-color: rgba(255, 255, 255, 0.18);
+  }
+
+  .vm-disciplines__cell:last-child,
+  .vm-process__step:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .vm-process__head h2 {
+    font-size: 26px;
+  }
+
+  .vm-process__step__num {
+    font-size: 36px;
+  }
+
+  /* ~1 tile visible on mobile */
+  .vm-work__tile {
+    min-width: 88%;
+  }
+
+  .vm-finale {
+    padding: 48px 20px;
+    gap: 36px;
+  }
+
+  .vm-finale__stats {
+    padding: 28px 0;
+  }
+
+  .vm-finale__stat {
+    gap: 8px;
+    padding: 0 16px 20px;
+  }
+}

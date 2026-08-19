@@ -1,0 +1,230 @@
+/* ============================================================
+   Velmont — Base styles (reset + body + fonts)
+   Loads AFTER tokens.css. See DESIGN_GUIDE §4 for layout system.
+   ============================================================ */
+
+/* ---- The Seasons (local) ----
+   OTF files must be placed at /assets/fonts/theseasons-*.otf.
+   These @font-face blocks are placeholders until client provides files.
+   The font stack falls back to Cormorant Garamond → Georgia → serif.
+*/
+@font-face {
+  font-family: 'The Seasons';
+  src: url('/assets/fonts/theseasons-lt.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'The Seasons';
+  src: url('/assets/fonts/theseasons-ltit.otf') format('opentype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'The Seasons';
+  src: url('/assets/fonts/theseasons-reg.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'The Seasons';
+  src: url('/assets/fonts/theseasons-it.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'The Seasons';
+  src: url('/assets/fonts/theseasons-bd.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---- Reset ---- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  /* Safety net for the off-canvas mobile nav panel (translateX(100%) is
+     still part of the fixed-position element's paint/scroll bounds even
+     though it's visually off-screen) and any other transform-based UI. */
+  overflow-x: hidden;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+img,
+picture,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+/* <source> must never generate a box — browsers don't apply display:none to
+   it by default, so a display:contents <picture> (used for AVIF gallery/grid
+   wrappers) would otherwise lift it into the layout as a phantom flex/grid
+   item and break sibling placement. */
+source {
+  display: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  padding: 0;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* ---- Body (DESIGN_GUIDE §4) ---- */
+body {
+  background: var(--paper);
+  color: var(--vblack);
+  font-family: var(--body);
+  font-size: var(--fs-body);
+  line-height: 1.72;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* The 1200px-tuned desktop layout only gets its min-width floor once it's
+   actually active. Below 1024px, the responsive overrides at the end of
+   this file (and of each page's own CSS file) take over instead. */
+@media (min-width: 1024px) {
+  body {
+    min-width: 1200px;
+  }
+}
+
+/* Focus visible — accessibility */
+:focus-visible {
+  outline: 2px solid var(--terracotta);
+  outline-offset: 3px;
+}
+
+/* Skip to content — hidden until keyboard-focused */
+.vm-skip-link {
+  position: absolute;
+  top: -48px;
+  left: 16px;
+  z-index: 1000;
+  padding: 12px 20px;
+  background: var(--vblack);
+  color: var(--paper);
+  font-family: var(--head);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+
+.vm-skip-link:focus-visible {
+  top: 16px;
+  outline-offset: 2px;
+}
+
+/* ----------------------------------------------------------------
+   Hero image entrance — fade in + subtle zoom settle
+   Applied to all static hero bg images site-wide
+   ---------------------------------------------------------------- */
+@keyframes vm-hero-appear {
+  from {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Fade-only variant for page/work heroes where scale zoom is unwanted */
+@keyframes vm-page-hero-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ----------------------------------------------------------------
+   Responsive — spacing/sizing token overrides (mobile + tablet)
+   Every consumer across every page CSS file reads these via var(), so
+   redefining them here cascades everywhere with no other file needing
+   to know about breakpoints for spacing/sizing purposes. Kept in THIS
+   file (not a separate responsive.css) because Vite's CSS chunking
+   does not reliably preserve <link> order across separate stylesheet
+   files once it splits a page's CSS into multiple chunks — appending
+   to the end of each page's already-loaded file guarantees correct
+   cascade order regardless of chunking. See DECISIONS.md.
+
+   Breakpoints: mobile <=599px, tablet 600-1023px, desktop >=1024px
+   (unchanged from the pre-existing design).
+   ---------------------------------------------------------------- */
+@media (max-width: 1023px) {
+  :root {
+    --pad-side: 40px;
+    --pad-tile-x: 28px;
+    --pad-tile-y: 24px;
+    --col-gap: 40px;
+    --gap-nav-links: 24px;
+    --nav-h: 72px;
+    --logo-h: 56px;
+    --hero-h: 540px;
+  }
+}
+
+@media (max-width: 599px) {
+  :root {
+    --pad-side: 20px;
+    --pad-tile-x: 20px;
+    --pad-tile-y: 20px;
+    --col-gap: 28px;
+    --nav-h: 64px;
+    --logo-h: 40px;
+    --hero-h: 440px;
+  }
+}

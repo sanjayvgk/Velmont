@@ -1,0 +1,619 @@
+/* ============================================================
+   Velmont — Project detail page
+   Reference: plan/DESIGN_GUIDE.md §5, plan/MASTER_PLAN.md §Phase 3
+   ============================================================ */
+
+/* ----------------------------------------------------------------
+   Breadcrumb
+   ---------------------------------------------------------------- */
+.vm-breadcrumb {
+  padding: 18px var(--pad-side);
+  border-bottom: 1px solid var(--mineral);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.vm-breadcrumb__item {
+  font-family: var(--body);
+  font-weight: 500;
+  font-size: 11.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--slate-text);
+  text-decoration: none;
+}
+
+.vm-breadcrumb__item:hover {
+  color: var(--vblack);
+}
+
+.vm-breadcrumb__sep {
+  font-family: var(--body);
+  font-size: 11px;
+  color: var(--mineral-text);
+  user-select: none;
+}
+
+.vm-breadcrumb__item--current {
+  color: var(--vblack);
+  pointer-events: none;
+}
+
+/* ----------------------------------------------------------------
+   Project hero — tall enough to show images without heavy crop
+   ---------------------------------------------------------------- */
+.vm-proj-hero {
+  position: relative;
+  height: 85vh;
+  min-height: 620px;
+  max-height: 980px;
+  padding: 60px var(--pad-side);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  background: #2e2b28; /* dark fallback if image fails */
+}
+
+/* Background photo — cover at natural centre, no forced position bias */
+.vm-proj-hero__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  z-index: 0;
+  animation: vm-hero-appear 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Gradient overlay — only bottom 40% darkened so image stays vibrant */
+.vm-proj-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    0deg,
+    rgba(8, 8, 8, 0.42) 0%,
+    rgba(8, 8, 8, 0.08) 40%,
+    rgba(8, 8, 8, 0) 100%
+  );
+}
+
+.vm-proj-hero__eyebrow,
+.vm-proj-hero__h1 {
+  position: relative;
+  z-index: 2;
+}
+
+.vm-proj-hero__eyebrow {
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: var(--fs-eyebrow);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(209, 200, 188, 0.8);
+  margin: 0 0 24px;
+}
+
+.vm-proj-hero__h1 {
+  font-family: var(--head);
+  font-weight: 600;
+  font-size: var(--fs-project-h1); /* 68px */
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  color: #fff;
+  margin: 0;
+  max-width: 900px;
+}
+
+/* The existing page geometry doubles as a branded loading skeleton. */
+main[data-project-state='loading'] .vm-proj-hero {
+  background: linear-gradient(105deg, #2e2b28 20%, #4a4540 45%, #2e2b28 70%);
+  background-size: 220% 100%;
+  animation: vm-project-shimmer 1.6s ease-in-out infinite;
+}
+
+main[data-project-state='loading'] .vm-proj-hero__bg {
+  opacity: 0;
+}
+
+main[data-project-state='loading'] .vm-proj-hero__eyebrow,
+main[data-project-state='loading'] .vm-proj-hero__h1 {
+  color: transparent;
+  background: rgba(244, 240, 235, 0.3);
+  border-radius: 2px;
+}
+
+main[data-project-state='loading'] .vm-proj-hero__eyebrow {
+  width: min(280px, 55vw);
+}
+
+main[data-project-state='loading'] .vm-proj-hero__h1 {
+  width: min(650px, 80vw);
+  min-height: 1.1em;
+}
+
+main[data-project-state='loading'] .vm-spec-bar__value,
+main[data-project-state='loading'] .vm-proj-body__lead,
+main[data-project-state='loading'] .vm-proj-body__right {
+  color: transparent;
+  background: linear-gradient(105deg, var(--concrete) 20%, #e4ded6 45%, var(--concrete) 70%);
+  background-size: 220% 100%;
+  animation: vm-project-shimmer 1.6s ease-in-out infinite;
+}
+
+main[data-project-state='loading'] .vm-proj-body__lead,
+main[data-project-state='loading'] .vm-proj-body__right {
+  min-height: 180px;
+}
+
+main[data-project-state='loading'] .vm-proj-gallery,
+main[data-project-state='loading'] .vm-proj-nav,
+main[data-project-state='loading'] .vm-other-projects {
+  visibility: hidden;
+}
+
+main[data-project-state='loaded'] .vm-proj-hero__bg,
+main[data-project-state='loaded'] .vm-spec-bar,
+main[data-project-state='loaded'] .vm-proj-body,
+main[data-project-state='loaded'] .vm-proj-gallery,
+main[data-project-state='loaded'] .vm-proj-nav,
+main[data-project-state='loaded'] .vm-other-projects {
+  animation: vm-project-content-in 360ms ease-out both;
+}
+
+@keyframes vm-project-shimmer {
+  to {
+    background-position: -120% 0;
+  }
+}
+
+@keyframes vm-project-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ----------------------------------------------------------------
+   Spec bar — concrete bg, 2px terracotta top border
+   ---------------------------------------------------------------- */
+.vm-spec-bar {
+  background: var(--concrete);
+  border-top: 2px solid var(--terracotta);
+  border-bottom: 1px solid var(--mineral);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.vm-spec-bar__cell {
+  padding: 24px var(--pad-tile-x);
+  border-right: 1px solid rgba(187, 188, 195, 0.55);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vm-spec-bar__cell:last-child {
+  border-right: 0;
+}
+
+.vm-spec-bar__label {
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: var(--fs-spec-label); /* 10px */
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--slate-text);
+}
+
+.vm-spec-bar__value {
+  font-family: var(--head);
+  font-weight: 500;
+  font-size: var(--fs-spec-value); /* 18px */
+  letter-spacing: -0.01em;
+  color: var(--vblack);
+  line-height: 1.3;
+}
+
+/* ----------------------------------------------------------------
+   Project body — 1.1fr 1fr, 80px gap
+   ---------------------------------------------------------------- */
+.vm-proj-body {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: var(--col-gap); /* 80px */
+  padding: 72px var(--pad-side);
+  border-bottom: 1px solid var(--mineral);
+}
+
+.vm-proj-body__lead {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: var(--fs-editorial-lead); /* 28px */
+  line-height: 1.5;
+  letter-spacing: 0.004em;
+  color: var(--vblack);
+  margin: 0;
+  align-self: start;
+  position: sticky;
+  top: calc(var(--nav-h) + 32px);
+}
+
+.vm-proj-body__right {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.vm-proj-body__para {
+  font-family: var(--body);
+  font-weight: 400;
+  font-size: var(--fs-body-sm); /* 14.5px */
+  line-height: 1.82;
+  color: var(--body-text);
+  margin: 0 0 22px;
+}
+
+.vm-proj-body__para:last-of-type {
+  margin-bottom: 32px;
+}
+
+.vm-proj-body__materials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.vm-material-tag {
+  font-family: var(--body);
+  font-weight: 500;
+  font-size: var(--fs-material-tag); /* 11.5px */
+  letter-spacing: 0.12em;
+  color: var(--body-text);
+  border: 1px solid var(--mineral);
+  padding: 7px 16px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* ----------------------------------------------------------------
+   Image gallery — adaptive layout driven by data-count (1–5 images)
+   Mobile: single-column stack; desktop: editorial grid.
+   Uses explicit pixel row heights so overflow:hidden cannot clip rows.
+   ---------------------------------------------------------------- */
+.vm-proj-gallery {
+  display: grid;
+  gap: 3px;
+  border-bottom: 1px solid var(--mineral);
+}
+
+/* AVIF <picture> wrappers must not become the grid item themselves — the
+   :nth-child grid-area rules below target .vm-proj-gallery__img directly. */
+.vm-proj-gallery picture {
+  display: contents;
+}
+
+.vm-proj-gallery__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  min-width: 0; /* prevent grid blowout (horizontal) */
+  min-height: 0; /* prevent grid blowout (vertical) */
+  cursor: pointer;
+}
+
+/* Mobile — stack vertically */
+@media (max-width: 767px) {
+  .vm-proj-gallery {
+    grid-template-columns: 1fr;
+  }
+  .vm-proj-gallery__img {
+    height: 280px;
+  }
+}
+
+/* Desktop — editorial grid per image count */
+@media (min-width: 768px) {
+  .vm-proj-gallery[data-count='1'] {
+    grid-template-columns: 1fr;
+    grid-template-rows: 620px;
+  }
+  .vm-proj-gallery[data-count='2'] {
+    grid-template-columns: 1.62fr 1fr;
+    grid-template-rows: 620px;
+  }
+  .vm-proj-gallery[data-count='3'] {
+    grid-template-columns: 1.62fr 1fr;
+    grid-template-rows: 340px 340px;
+  }
+  .vm-proj-gallery[data-count='3'] [data-gallery-img='0'] {
+    grid-row: 1 / 3;
+  }
+  .vm-proj-gallery[data-count='4'] {
+    grid-template-columns: 1.62fr 1fr;
+    grid-template-rows: 280px 280px 280px;
+  }
+  .vm-proj-gallery[data-count='4'] [data-gallery-img='0'] {
+    grid-row: 1 / 3;
+  }
+  .vm-proj-gallery[data-count='4'] [data-gallery-img='3'] {
+    grid-column: 1;
+  }
+  .vm-proj-gallery[data-count='5'] {
+    grid-template-columns: 1.62fr 1fr;
+    grid-template-rows: 320px 320px 320px;
+  }
+  .vm-proj-gallery[data-count='5'] [data-gallery-img='0'] {
+    grid-row: 1 / 3;
+  }
+  .vm-proj-gallery[data-count='5'] [data-gallery-img='3'] {
+    grid-column: 1;
+  }
+}
+
+/* ----------------------------------------------------------------
+   Prev / Next project navigation bar
+   ---------------------------------------------------------------- */
+.vm-proj-nav {
+  display: flex;
+  border-bottom: 1px solid var(--mineral);
+}
+
+.vm-proj-nav__btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 36px var(--pad-side);
+  text-decoration: none;
+  color: var(--vblack);
+  transition: background 0.2s;
+}
+
+.vm-proj-nav__btn:hover {
+  background: var(--concrete);
+}
+
+.vm-proj-nav__btn--next {
+  justify-content: flex-end;
+  border-left: 1px solid var(--mineral);
+}
+
+.vm-proj-nav__arrow {
+  font-size: 24px;
+  color: var(--terracotta);
+  flex-shrink: 0;
+}
+
+.vm-proj-nav__label {
+  font-family: var(--body);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--slate-text);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.vm-proj-nav__title {
+  font-family: var(--head);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  display: block;
+}
+
+/* ----------------------------------------------------------------
+   Other Projects strip
+   ---------------------------------------------------------------- */
+.vm-other-projects {
+  padding: 72px var(--pad-side);
+  border-bottom: 1px solid var(--mineral);
+}
+
+.vm-other-projects__hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+}
+
+.vm-other-projects__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--col-gap, 80px);
+}
+
+.vm-other-tile {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.vm-other-tile__img-wrap {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--concrete);
+}
+
+.vm-other-tile__img-wrap picture {
+  display: contents;
+}
+
+.vm-other-tile__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.vm-other-tile:hover .vm-other-tile__img {
+  transform: scale(1.04);
+}
+
+.vm-other-tile__disc {
+  font-family: var(--body);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--terracotta);
+}
+
+.vm-other-tile__title {
+  font-family: var(--head);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 4px 0 0;
+}
+
+.vm-other-tile__loc {
+  font-family: var(--body);
+  font-size: 13px;
+  color: var(--slate-text);
+}
+
+/* ----------------------------------------------------------------
+   Lightbox — full-screen image viewer
+   ---------------------------------------------------------------- */
+.vm-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: rgba(0, 0, 0, 0.93);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vm-lightbox[hidden] {
+  display: none;
+}
+
+.vm-lightbox__img {
+  max-width: 90vw;
+  max-height: 88vh;
+  object-fit: contain;
+  display: block;
+  user-select: none;
+}
+
+.vm-lightbox__close {
+  position: absolute;
+  top: 28px;
+  right: 36px;
+  font-size: 40px;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.75);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.vm-lightbox__close:focus {
+  outline: none;
+}
+
+.vm-lightbox__close:focus-visible {
+  outline: 2px solid var(--terracotta);
+  outline-offset: 6px;
+  border-radius: 2px;
+}
+
+.vm-lightbox__close:hover {
+  color: #fff;
+}
+
+.vm-lightbox__prev,
+.vm-lightbox__next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 56px;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.65);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 28px;
+  user-select: none;
+}
+
+.vm-lightbox__prev:hover,
+.vm-lightbox__next:hover {
+  color: #fff;
+}
+
+.vm-lightbox__prev {
+  left: 0;
+}
+
+.vm-lightbox__next {
+  right: 0;
+}
+
+/* ---- Responsive (see base.css for the shared media-query rationale) ---- */
+@media (max-width: 1023px) {
+  .vm-proj-hero {
+    padding: 40px var(--pad-side);
+    min-height: 440px;
+    max-height: 600px;
+  }
+
+  .vm-spec-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .vm-spec-bar__cell:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .vm-spec-bar__cell:nth-child(-n + 2) {
+    border-bottom: 1px solid rgba(187, 188, 195, 0.55);
+  }
+
+  .vm-proj-body {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 48px var(--pad-side);
+  }
+
+  .vm-proj-body__lead {
+    position: static;
+    top: auto;
+  }
+
+  .vm-other-projects__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 599px) {
+  .vm-proj-hero {
+    min-height: 380px;
+    max-height: 480px;
+    padding: 28px var(--pad-side);
+  }
+
+  .vm-other-projects__grid {
+    grid-template-columns: 1fr;
+  }
+}

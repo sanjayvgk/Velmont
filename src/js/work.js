@@ -1,0 +1,105 @@
+// Velmont — Work list page.
+// Fetches /data/projects.json, renders the project grid, and wires the discipline filter.
+
+import { avifFor } from './picture-utils.js';
+
+/**
+ * Build the HTML for a single project grid tile.
+ * @param {object} p - project record
+ * @returns {string}
+ */
+export function renderGridTile(p) {
+  const slug = String(p.slug || '').replace(/[^a-z0-9-]/gi, '');
+  const year = p.year != null ? String(p.year) : '—';
+  const loc = String(p.location || '');
+  const meta = loc && year !== '—' ? `${loc} · ${year}` : loc || year;
+  const cover = String(p.images?.hero || '');
+  const avif = avifFor(cover);
+  const title = String(p.title || '');
+  return [
+    `<a class="vm-grid-tile" href="/work/${slug}" data-discipline="${p.discipline || ''}" data-tile="${slug}">`,
+    `<div class="vm-grid-tile__img-wrap">`,
+    `<picture>`,
+    avif ? `<source type="image/avif" srcset="${avif}" />` : '',
+    `<img class="vm-grid-tile__img" src="${cover}" alt="${title}" loading="lazy" width="760" height="500" />`,
+    `</picture>`,
+    `</div>`,
+    `<div class="vm-grid-tile__content">`,
+    `<div>`,
+    `<p class="vm-grid-tile__discipline">${p.discipline || ''}</p>`,
+    `<p class="vm-grid-tile__name">${title}</p>`,
+    `<p class="vm-grid-tile__meta">${meta}</p>`,
+    `</div>`,
+    `<div class="vm-grid-tile__foot">`,
+    `<span class="vm-grid-tile__year">${year !== '—' ? year : ''}</span>`,
+    `<span class="vm-grid-tile__arrow" aria-hidden="true">→</span>`,
+    `</div>`,
+    `</div>`,
+    `</a>`,
+  ].join('');
+}
+
+/**
+ * Filter tiles by discipline. Pass null / "All" to show all.
+ * @param {HTMLElement} grid
+ * @param {string|null} discipline
+ */
+export function applyFilter(grid, discipline) {
+  const tiles = grid.querySelectorAll('[data-discipline]');
+  tiles.forEach((tile) => {
+    if (!discipline || discipline === 'All') {
+      tile.removeAttribute('hidden');
+    } else {
+      if (tile.dataset.discipline === discipline) {
+        tile.removeAttribute('hidden');
+      } else {
+        tile.setAttribute('hidden', '');
+      }
+    }
+  });
+}
+
+async function loadProjects() {
+  if (import.meta.env.VITE_FIREBASE_PROJECT_ID) {
+    try {
+      const { getPublishedProjects } = await import('../lib/firebase-data.js');
+      return await getPublishedProjects();
+    } catch (err) {
+      console.warn('[work] Firestore unavailable, falling back to JSON:', err && err.message);
+    }
+  }
+  try {
+    const res = await fetch('/data/projects.json', { credentials: 'same-origin' });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.warn('[work] projects.json fetch failed', err && err.message);
+    return null;
+  }
+}
+
+export async function initWork() {
+  const grid = document.querySelector('[data-work-grid]');
+  if (!grid) return;
+
+  const projects = await loadProjects();
+  if (!projects) {
+    grid.innerHTML = '<p style="padding:40px;color:var(--slate)">Projects loading…</p>';
+    return;
+  }
+
+  const published = projects
+    .filter((p) => p.published)
+    .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+  grid.innerHTML = published.map((p) => renderGridTile(p)).join('');
+
+  // Wire filter buttons
+  const filterBtns = document.querySelectorAll('[data-filter-btn]');
+  filterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach((b) => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      applyFilter(grid, btn.dataset.filterBtn || null);
+    });
+  });
+}

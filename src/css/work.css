@@ -1,0 +1,201 @@
+/* ============================================================
+   Velmont — Work list page
+   Reference: plan/DESIGN_GUIDE.md §5, plan/MASTER_PLAN.md §Phase 3
+   ============================================================ */
+
+/* ---- Work hero — see common.css (.vm-page-hero, shared by About/Services/Contact/Work) ---- */
+
+/* ----------------------------------------------------------------
+   Filter bar
+   ---------------------------------------------------------------- */
+.vm-work-filter {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 var(--pad-side);
+  border-bottom: 1px solid var(--mineral);
+}
+
+.vm-work-filter__btn {
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--slate-text);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 18px 28px;
+  cursor: pointer;
+  transition:
+    color var(--t-fast) var(--ease-default),
+    border-color var(--t-fast) var(--ease-default);
+}
+
+.vm-work-filter__btn:hover {
+  color: var(--vblack);
+}
+
+.vm-work-filter__btn.is-active {
+  color: var(--vblack);
+  border-bottom-color: var(--terracotta);
+}
+
+/* ----------------------------------------------------------------
+   Project grid — 1 project per full row (editorial list layout)
+   ---------------------------------------------------------------- */
+.vm-work-grid {
+  display: block;
+  border-bottom: 1px solid var(--mineral);
+}
+
+/* ----------------------------------------------------------------
+   Project tile — two-column: image left, info right (alternating)
+   ---------------------------------------------------------------- */
+.vm-grid-tile {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  min-height: 500px;
+  border-bottom: 1px solid var(--mineral);
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Even tiles: image moves to the right for alternating rhythm */
+.vm-grid-tile:nth-child(even) .vm-grid-tile__img-wrap {
+  order: 2;
+}
+
+/* Hidden tiles when filter is active */
+.vm-grid-tile[hidden] {
+  display: none;
+}
+
+/* ----------------------------------------------------------------
+   Tile image
+   ---------------------------------------------------------------- */
+.vm-grid-tile__img-wrap {
+  overflow: hidden;
+}
+
+/* AVIF <picture> wrapper must not break the img's height:100% chain */
+.vm-grid-tile__img-wrap picture {
+  display: contents;
+}
+
+.vm-grid-tile__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.65s var(--ease-default);
+}
+
+.vm-grid-tile:hover .vm-grid-tile__img {
+  transform: scale(1.04);
+}
+
+/* ----------------------------------------------------------------
+   Tile content panel
+   ---------------------------------------------------------------- */
+.vm-grid-tile__content {
+  padding: 52px var(--pad-side) 52px var(--pad-tile-x);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-left: 1px solid var(--mineral);
+}
+
+.vm-grid-tile:nth-child(even) .vm-grid-tile__content {
+  border-left: 0;
+  border-right: 1px solid var(--mineral);
+  padding: 52px var(--pad-tile-x) 52px var(--pad-side);
+}
+
+.vm-grid-tile__discipline {
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--slate-text);
+  margin: 0 0 16px;
+}
+
+.vm-grid-tile__name {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 36px;
+  line-height: 1.14;
+  color: var(--vblack);
+  margin: 0 0 16px;
+}
+
+.vm-grid-tile__meta {
+  font-family: var(--body);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--mineral-text);
+  margin: 0 0 0;
+  flex: 1;
+}
+
+.vm-grid-tile__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 20px;
+  border-top: 1px solid var(--mineral);
+  margin-top: 40px;
+}
+
+.vm-grid-tile__year {
+  font-family: var(--body);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mineral-text);
+}
+
+.vm-grid-tile__arrow {
+  color: var(--terracotta);
+  font-size: 20px;
+}
+
+/* ---- Responsive (see base.css for the shared media-query rationale) ----
+   .vm-page-hero responsive rules moved to common.css. */
+@media (max-width: 1023px) {
+  /* Filter bar — 5 buttons don't fit a narrow viewport; scroll instead
+     of wrap so the underline/active-state interaction stays intact. */
+  .vm-work-filter {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .vm-work-filter__btn {
+    flex-shrink: 0;
+    padding: 16px 18px;
+  }
+
+  .vm-grid-tile {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .vm-grid-tile__img-wrap {
+    aspect-ratio: 4 / 3;
+  }
+
+  .vm-grid-tile:nth-child(even) .vm-grid-tile__img-wrap {
+    order: 0;
+  }
+
+  .vm-grid-tile__content,
+  .vm-grid-tile:nth-child(even) .vm-grid-tile__content {
+    border-left: 0;
+    border-right: 0;
+    padding: 32px var(--pad-side);
+  }
+}

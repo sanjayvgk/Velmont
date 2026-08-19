@@ -1,0 +1,216 @@
+/* ============================================================
+   Velmont — Nav
+   Spec: plan/DESIGN_GUIDE.md §5 Navigation, §3 typography
+   ============================================================ */
+
+.vm-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--nav-h); /* 94px */
+  padding: 0 var(--pad-side); /* 0 80px */
+  background: var(--paper);
+  border-bottom: 1px solid var(--mineral);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+/* ---- Brand (logo + tagline) ---- */
+.vm-nav__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-decoration: none;
+  color: inherit;
+}
+
+.vm-nav__logo img {
+  height: var(--logo-h); /* 82px */
+  width: auto;
+  transform: translateY(-8px); /* optical alignment, DESIGN_GUIDE §5 */
+}
+
+.vm-nav__tagline {
+  display: block;
+  margin-top: -28px; /* -20px base + 8px to compensate logo translateY(-8px) */
+  font-family: var(--body);
+  font-weight: 500;
+  font-size: var(--fs-nav-tagline); /* 9.5px */
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--slate-text);
+}
+
+/* ---- Links ---- */
+.vm-nav__links {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-nav-links); /* 44px */
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vm-nav__link {
+  font-family: var(--body);
+  font-weight: 500;
+  font-size: var(--fs-nav-link); /* 13.5px */
+  letter-spacing: 0.04em;
+  color: #5a5550;
+  text-decoration: none;
+  padding-bottom: 4px;
+  border-bottom: 2px solid transparent;
+  transition: color var(--t-fast) var(--ease-default);
+}
+
+.vm-nav__link:hover {
+  color: var(--vblack);
+}
+
+.vm-nav__link[aria-current='page'],
+.vm-nav__link.is-active {
+  color: var(--vblack);
+  border-bottom-color: var(--terracotta);
+}
+
+/* ---- Mobile menu toggle + panel ----
+   Hidden at desktop by default; the responsive block at the end of this
+   file activates them below 1024px. .vm-nav__panel uses display:contents
+   at desktop so its children (links + CTA) remain direct flex items of
+   .vm-nav — this preserves the exact original 3-item space-between
+   layout without any desktop-specific styling needed here. */
+.vm-nav__toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 44px;
+  height: 44px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.vm-nav__toggle-bar {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--vblack);
+  transition:
+    transform var(--t-fast) var(--ease-default),
+    opacity var(--t-fast) var(--ease-default);
+}
+
+.vm-nav--open .vm-nav__toggle-bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.vm-nav--open .vm-nav__toggle-bar:nth-child(2) {
+  opacity: 0;
+}
+
+.vm-nav--open .vm-nav__toggle-bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+.vm-nav__panel {
+  display: contents;
+}
+
+/* ---- Enquire CTA ---- */
+.vm-nav__cta {
+  display: inline-block;
+  font-family: var(--body);
+  font-weight: 500;
+  font-size: var(--fs-nav-cta); /* 12px */
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--vblack);
+  background: transparent;
+  border: 1px solid var(--terracotta);
+  border-radius: 2px;
+  padding: 11px 28px;
+  text-decoration: none;
+  transition:
+    background var(--t-fast) var(--ease-default),
+    color var(--t-fast) var(--ease-default);
+}
+
+.vm-nav__cta:hover {
+  background: var(--terracotta);
+  color: var(--paper);
+}
+
+/* ---- Responsive (see base.css for the shared media-query rationale) ---- */
+@media (max-width: 1023px) {
+  .vm-nav__toggle {
+    display: flex;
+  }
+
+  .vm-nav__panel {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 32px;
+    position: fixed;
+    inset: var(--nav-h) 0 0 0;
+    background: var(--paper);
+    padding: 40px var(--pad-side);
+    overflow-y: auto;
+    transform: translateX(100%);
+    visibility: hidden;
+    transition:
+      transform var(--t-base) var(--ease-default),
+      visibility 0s linear var(--t-base);
+    z-index: 19;
+  }
+
+  .vm-nav--open .vm-nav__panel {
+    transform: translateX(0);
+    visibility: visible;
+    transition:
+      transform var(--t-base) var(--ease-default),
+      visibility 0s linear 0s;
+  }
+
+  .vm-nav__links {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
+    width: 100%;
+  }
+
+  .vm-nav__link {
+    font-size: 20px;
+    padding: 10px 0;
+    display: block;
+  }
+
+  .vm-nav__cta {
+    width: 100%;
+    text-align: center;
+    padding: 16px 28px;
+  }
+
+  html.vm-nav-open-lock {
+    overflow: hidden;
+  }
+
+  /* Tagline's negative margin-top is tuned for the 82px desktop logo
+     (see comment above .vm-nav__tagline); scale it down with --logo-h
+     so it keeps closing whitespace instead of overlapping the shrunk
+     logo (was causing visible overlap at tablet/mobile widths). */
+  .vm-nav__tagline {
+    margin-top: -22px; /* -14px base (56/82 of -20px) - 8px translateY comp */
+  }
+}
+
+@media (max-width: 599px) {
+  .vm-nav__tagline {
+    margin-top: -18px; /* -10px base (40/82 of -20px) - 8px translateY comp */
+  }
+}
