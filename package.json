@@ -1,0 +1,44 @@
+{
+  "name": "velmont-website",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Velmont Design Studio — commercial interior contracting website",
+  "scripts": {
+    "dev": "npm run copy-components && npm run copy-data && vite",
+    "build": "npm run copy-components && npm run copy-data && npm run verify-images && vite build && npm run generate-pages && npm run generate-sitemap",
+    "generate-pages": "node scripts/generate-project-pages.js",
+    "generate-sitemap": "node scripts/generate-sitemap.js",
+    "preview": "vite preview --port 5173",
+    "preview:ci": "vite preview --port 5173",
+    "copy-components": "node scripts/copy-components.js",
+    "copy-data": "node scripts/copy-data.js",
+    "optimize-images": "node scripts/convert-images.js",
+    "verify-images": "node scripts/verify-images.js",
+    "lint": "eslint \"src/**/*.{js,mjs}\" \"scripts/**/*.js\" \"__tests__/**/*.js\" \"e2e/**/*.js\"",
+    "format": "prettier --write \"src/**/*.{js,css,html}\" \"scripts/**/*.js\"",
+    "format:check": "prettier --check \"src/**/*.{js,css,html}\" \"scripts/**/*.js\"",
+    "seed": "node scripts/seed-firestore.js",
+    "upload-images": "node scripts/upload-project-images.js",
+    "migrate-firebase": "node scripts/migrate-firebase-project.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "e2e": "playwright test",
+    "e2e:install": "playwright install --with-deps chromium",
+    "lighthouse": "lhci autorun"
+  },
+  "devDependencies": {
+    "@lhci/cli": "^0.13.0",
+    "@playwright/test": "^1.45.0",
+    "eslint": "^8.57.0",
+    "firebase-admin": "^14.0.0",
+    "jsdom": "^24.1.0",
+    "prettier": "^3.3.0",
+    "sharp": "^0.33.4",
+    "vite": "^5.3.0",
+    "vitest": "^1.6.0"
+  },
+  "dependencies": {
+    "firebase": "^12.15.0"
+  }
+}
