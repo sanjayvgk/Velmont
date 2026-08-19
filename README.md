@@ -3,7 +3,7 @@
 B2B commercial interior contracting company website for Velmont Design LLP, Bengaluru.
 
 **Status:** Phase 7 complete (production hardening) + mobile-responsive retrofit. All pages wired; enquiry form with EmailJS submit; Google Maps embed. Awaiting Phase 8 (Vercel deploy + domain).
-**Live domain:** velmontdesign.com (not yet deployed)
+**Live domain:** [velmontdesign.com](https://www.velmontdesign.com/)
 **Stack:** Vanilla HTML/CSS/JS + Vite · Firebase · Vercel · Playwright · Vitest
 
 ---
